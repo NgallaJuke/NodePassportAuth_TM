@@ -7,8 +7,8 @@ const app = express();
 // DB config
 const db = require('./config/keys').MongoURI;
 // Connect to mongo
-mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true })
-  .then(() => console.log('Mongo DB connected'))
+mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB connected...'))
   .catch(err => console.log(err)
   );
 
@@ -16,6 +16,9 @@ mongoose.connect(db, { useUnifiedTopology: true, useNewUrlParser: true })
 // VIEWS EJS Middlewar
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
+
+// BodyParser middleware
+app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use('/', require('./routes/index'));
