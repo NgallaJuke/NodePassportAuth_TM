@@ -35,7 +35,8 @@ router.post('/register', (req, res) => {
       password2
     });
   } else {
-    // Validation pass
+    // if there is no err at all we check if the user already exist in MongoDB
+
     User.findOne({ email: email })
       .then(user => {
         if (user) {
@@ -49,20 +50,26 @@ router.post('/register', (req, res) => {
             password2
           });
         } else {
+          //is the user doesn't exist the we create and hash is password before saving it
           const newUser = new User({
             name,
             email,
             password
           });
-          console.log(newUser);
-          res.send('hello');
 
+          // Hash the password with bcrypt
+          // Generating a Salt
+          bcrypt.genSalt(10, (err, salt) =>
+            // Hashing the password with the salt
+            bcrypt.hash(newUser.password, salt, (err, hash) => {
+              if (err) throw err;
+              // Save the User in the Database
+              newUser.save()//Saving the User in MongoDB
+                .then(user => res.redirect('/users/login'))
+                .catch(err => console.log(err));
+            }));
         }
-
-      })
-      .catch();
-
+      });
   }
-
 });
 module.exports = router;
