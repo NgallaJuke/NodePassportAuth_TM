@@ -3,6 +3,9 @@ const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+
+
+
 // login page
 router.get('/login', (req, res) => res.render('login'));
 // register page
@@ -59,17 +62,24 @@ router.post('/register', (req, res) => {
 
           // Hash the password with bcrypt
           // Generating a Salt
-          bcrypt.genSalt(10, (err, salt) =>
+          bcrypt.genSalt(10, (err, salt) => {
             // Hashing the password with the salt
             bcrypt.hash(newUser.password, salt, (err, hash) => {
               if (err) throw err;
               // Save the User in the Database
               newUser.save()//Saving the User in MongoDB
-                .then(user => res.redirect('/users/login'))
+                .then(user => {
+                  // Using the global variable success_msg created in app.js 
+                  // using flash to render the message when we redirect
+                  req.flash('success_msg', 'You are now registered and can log in');
+                  res.redirect('/users/login');
+                })
                 .catch(err => console.log(err));
-            }));
+            });
+          });
         }
       });
   }
 });
 module.exports = router;
+
