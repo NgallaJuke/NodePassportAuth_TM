@@ -4,9 +4,14 @@ const mongoose = require('mongoose');
 //Store the message in a session and display it after we redirect  
 const flash = require('connect-flash');
 const session = require('express-session');
+const passport = require('passport');
+
+
 
 const app = express();
 
+//Passport Config
+require('./config/passport')(passport);
 // DB config
 const db = require('./config/keys').MongoURI;
 
@@ -31,6 +36,10 @@ app.use(session({
   saveUninitialized: true
 }));
 
+// PassPort Middleware to put after express Session
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Flash Middleware
 app.use(flash());
 
@@ -38,6 +47,7 @@ app.use(flash());
 app.use((req, res, next) => {
   res.locals.success_msg = req.flash('success_msg');
   res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
   next();
 });
 
